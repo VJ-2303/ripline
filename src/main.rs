@@ -1,23 +1,35 @@
 use std::{env, fs};
 
+struct Config {
+    query: String,
+    filename: String,
+}
+
+impl Config {
+    fn new(args: &[String]) -> Config {
+        if args.len() < 3 {
+            panic!("not enough arguments");
+        }
+        let query = args[1].clone();
+        let filename = args[2].clone();
+
+        Config { query, filename }
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() < 3 {
-        panic!("Not enough arguments provided");
-    }
+    let config = Config::new(&args);
 
-    let query = &args[1];
-    let filename = &args[2];
+    println!("Searching for: {}", config.query);
+    println!("In file: {}", config.filename);
 
-    let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
-
-    println!("Searching for: {}", query);
-    println!("In file: {}", filename);
-    println!("--- Results ---");
+    let contents =
+        fs::read_to_string(&config.filename).expect("Something went wrong reading the file");
 
     for line in contents.lines() {
-        if line.contains(query) {
+        if line.contains(&config.query) {
             println!("{}", line)
         }
     }
