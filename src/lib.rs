@@ -1,4 +1,5 @@
-use std::{error::Error, fs};
+use std::io::{self, BufRead};
+use std::{error::Error, fs::File};
 
 pub struct Config {
     pub query: String,
@@ -24,16 +25,22 @@ impl Config {
 }
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    let contents = fs::read_to_string(config.filename)?;
+    let file = File::open(config.filename)?;
+    let reader = io::BufReader::new(file);
 
-    let results = if config.ignore_case {
-        search_case_insensitive(&config.query, &contents)
-    } else {
-        search(&config.query, &contents)
-    };
+    let query_lower = config.query.to_lowercase();
 
-    for line in results {
-        println!("{}", line)
+    for line_result in reader.lines() {
+        let line = line_result?;
+
+        let matches = if config.ignore_case {
+            line.to_lowercase().contains(&query_lower)
+        } else {
+            line.contains(&config.query)
+        };
+        if matches {
+            println!("{}", line);
+        }
     }
     Ok(())
 }
