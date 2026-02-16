@@ -1,31 +1,24 @@
+use clap::Parser;
 use std::io::{self, BufRead};
 use std::{error::Error, fs::File};
 
+/// Simple program to search for a string in a file
+#[derive(Parser)]
+#[command(version, about, long_about=None)]
 pub struct Config {
+    /// The string to search for
     pub query: String,
+
+    /// The file to search in
     pub filename: String,
+
+    /// Ignore case distinctions (flag: -i or --ignore-case)
+    #[arg(short, long)]
     pub ignore_case: bool,
 }
 
-impl Config {
-    pub fn build(args: &[String]) -> Result<Config, &'static str> {
-        if args.len() < 3 {
-            return Err("not enough arguments");
-        }
-        let query = args[1].clone();
-        let filename = args[2].clone();
-        let ignore_case = std::env::var("IGNORE_CASE").is_ok();
-
-        Ok(Config {
-            query,
-            filename,
-            ignore_case,
-        })
-    }
-}
-
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    let file = File::open(config.filename)?;
+    let file = File::open(&config.filename)?;
     let reader = io::BufReader::new(file);
 
     let query_lower = config.query.to_lowercase();
