@@ -1,5 +1,6 @@
 use std::io::{self, BufRead};
 use std::{error::Error, fs::File};
+pub mod algorithms;
 
 pub struct Config {
     pub query: String,
