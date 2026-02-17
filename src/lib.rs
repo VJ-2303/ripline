@@ -1,4 +1,5 @@
 use clap::Parser;
+use colored::*;
 use std::io::{self, BufRead};
 use std::{error::Error, fs::File};
 
@@ -23,7 +24,7 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
     let query_lower = config.query.to_lowercase();
 
-    for line_result in reader.lines() {
+    for (index, line_result) in reader.lines().enumerate() {
         let line = line_result?;
 
         let matches = if config.ignore_case {
@@ -32,7 +33,12 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
             line.contains(&config.query)
         };
         if matches {
-            println!("{}", line);
+            let line_num = (index + 1).to_string().green();
+
+            let match_text = config.query.red().to_string();
+            let colored_line = line.replace(&config.query, &match_text);
+
+            println!("{}: {}", line_num, colored_line);
         }
     }
     Ok(())

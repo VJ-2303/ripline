@@ -5,9 +5,6 @@ use std::process;
 fn main() {
     let config = Config::parse();
 
-    println!("Searching for: {}", config.query);
-    println!("In file: {}", config.filename);
-
     if let Err(e) = ripline::run(config) {
         eprintln!("Application error: {}", e);
         process::exit(1);
